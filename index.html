@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+  <meta charset="UTF-8">
+  <title>Contact Manager Dashboard</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-color: #1e293b;
+      --border-color: #e2e8f0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+    }
+
+    /* 1. NAV BAR 1: Top Brand / Header Bar */
+    .top-nav {
+      background-color: #0f172a;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .top-nav h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    /* 2. NAV BAR 2: Main Navigation Bar (Dashboard, Ku Dar, Raadi, Report) */
+    .section-nav {
+      background-color: white;
+      display: flex;
+      border-bottom: 1px solid var(--border-color);
+      padding: 0 30px;
+    }
+    .nav-tab {
+      padding: 15px 20px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #64748b;
+      border-bottom: 3px solid transparent;
+    }
+    .nav-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    /* Main Container & Views */
+    .container {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+    .view-section {
+      display: none;
+    }
+    .view-section.active {
+      display: block;
+    }
+
+    /* 3. NAV BAR 3: Category Filter Bar */
+    .filter-nav {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .filter-btn {
+      background: white;
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .filter-btn.active {
+      background-color: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* 4. NAV BAR 4: Quick Action / Utility Bar */
+    .utility-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #e2e8f0;
+      padding: 10px 15px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+    }
+    .utility-btn {
+      background: #dc2626;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    /* Cards & Report Styles */
+    .card {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    .stat-card {
+      background: #f1f5f9;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .stat-card h4 { margin: 0; color: #64748b; font-size: 14px; }
+    .stat-card p { margin: 10px 0 0 0; font-size: 24px; font-weight: bold; color: var(--primary); }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+    button.action-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .contact-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      padding: 15px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 10px;
+    }
+    .btn-group button {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 5px;
+    }
+    .btn-edit { background-color: #f59e0b; color: white; }
+    .btn-delete { background-color: #ef4444; color: white; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV BAR 1: Header / System Title -->
+  <div class="top-nav">
+    <h1>📱 Contact Manager Dashboard</h1>
+    <span id="total-badge">Total: 0</span>
+  </div>
+
+  <!-- NAV BAR 2: Main Views (Dashboard, Ku Dar, Raadi, Report) -->
+  <div class="section-nav">
+    <div class="nav-tab active" onclick="switchView('home-view', this)">🏠 Dashboard / List</div>
+    <div class="nav-tab" onclick="switchView('form-view', this)">➕ Ku Dar Contact</div>
+    <div class="nav-tab" onclick="switchView('search-view', this)">🔍 Raadinta Degdegga ah</div>
+    <div class="nav-tab" onclick="switchView('report-view', this)">📊 Report & Analytics</div>
+  </div>
+
+  <div class="container">
+
+    <!-- VIEW 1: HOME / ALL CONTACTS -->
+    <div id="home-view" class="view-section active">
+      
+      <!-- NAV BAR 3: Category Filter Bar -->
+      <div class="filter-nav">
+        <button class="filter-btn active" onclick="filterByCategory('Dhammaan', this)">Dhammaan</button>
+        <button class="filter-btn" onclick="filterByCategory('Qoyska', this)">Qoyska</button>
+        <button class="filter-btn" onclick="filterByCategory('Shaqada', this)">Shaqada</button>
+        <button class="filter-btn" onclick="filterByCategory('Macaamiisha', this)">Macaamiisha</button>
+      </div>
+
+      <!-- NAV BAR 4: Quick Utility Bar -->
+      <div class="utility-nav">
+        <span>⚡ Quick Actions:</span>
+        <button class="utility-btn" onclick="clearAllContacts()">🗑️ Tirtir Dhammaan Contacts-ka</button>
+      </div>
+
+      <div id="contacts-list-container"></div>
+    </div>
+
+    <!-- VIEW 2: ADD / EDIT FORM -->
+    <div id="form-view" class="view-section">
+      <div class="card">
+        <h3 id="form-heading">Ku Dar Contact Cusub</h3>
+        <form id="contact-form">
+          <input type="hidden" id="contact-id">
+          <label>Magaca Buuxa:</label>
+          <input type="text" id="full-name" required>
+          
+          <label>Lambarka Telefoonka:</label>
+          <input type="tel" id="phone" required>
+          
+          <label>E-mail:</label>
+          <input type="email" id="email" required>
+          
+          <label>Shirkadda / Xirfadda:</label>
+          <input type="text" id="company">
+          
+          <label>Cinwaanka:</label>
+          <input type="text" id="address">
+
+          <label>Category-ga:</label>
+          <select id="category">
+            <option value="Qoyska">Qoyska</option>
+            <option value="Shaqada">Shaqada</option>
+            <option value="Macaamiisha">Macaamiisha</option>
+          </select>
+          
+          <button type="submit" class="action-btn">Kaydi (Save)</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- VIEW 3: SEARCH VIEW -->
+    <div id="search-view" class="view-section">
+      <div class="card">
+        <h3>Raadi Xiriiriye</h3>
+        <input type="text" id="live-search-input" placeholder="Ku qor magac, tel, ama email aad rabto...">
+      </div>
+      <div id="search-results-container"></div>
+    </div>
+
+    <!-- VIEW 4: REPORT & ANALYTICS -->
+    <div id="report-view" class="view-section">
+      <div class="card">
+        <h3>📊 Warbixinta iyo Tirakoobka (Report)</h3>
+        <p>Halkan ka eeg warbixinta guud ee contacts-kaaga kaydsan:</p>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h4>Guud Ahaan Contacts</h4>
+            <p id="rpt-total">0</p>
+          </div>
+          <div class="stat-card">
+            <h4>Kooxda Qoyska</h4>
+            <p id="rpt-qoyska">0</p>
+          </div>
+          <div class="stat-card">
+            <h4>Kooxda Shaqada</h4>
+            <p id="rpt-shaqada">0</p>
+          </div>
+          <div class="stat-card">
+            <h4>Macaamiisha</h4>
+            <p id="rpt-macaamiisha">0</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let contacts = JSON.parse(localStorage.getItem('contacts_db')) || [];
+
+    const contactForm = document.getElementById('contact-form');
+    const contactIdInput = document.getElementById('contact-id');
+    const fullNameInput = document.getElementById('full-name');
+    const phoneInput = document.getElementById('phone');
+    const emailInput = document.getElementById('email');
+    const companyInput = document.getElementById('company');
+    const addressInput = document.getElementById('address');
+    const categoryInput = document.getElementById('category');
+    
+    const contactsListContainer = document.getElementById('contacts-list-container');
+    const searchResultsContainer = document.getElementById('search-results-container');
+    const totalBadge = document.getElementById('total-badge');
+    const liveSearchInput = document.getElementById('live-search-input');
+
+    let currentCategoryFilter = 'Dhammaan';
+
+    function switchView(viewId, tabElement) {
+      document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+      
+      document.getElementById(viewId).classList.add('active');
+      tabElement.classList.add('active');
+      
+      if(viewId === 'home-view') renderContacts();
+      if(viewId === 'report-view') generateReport();
+    }
+
+    function renderContacts(dataToRender = contacts) {
+      totalBadge.textContent = `Total: ${contacts.length}`;
+      
+      let filteredData = dataToRender;
+      if (currentCategoryFilter !== 'Dhammaan' && dataToRender === contacts) {
+        filteredData = contacts.filter(c => c.category === currentCategoryFilter);
+      }
+
+      if (filteredData.length === 0) {
+        contactsListContainer.innerHTML = '<p class="card">Wax contact ah ma jiraan.</p>';
+        return;
+      }
+
+      contactsListContainer.innerHTML = '';
+      filteredData.forEach(contact => {
+        contactsListContainer.innerHTML += `
+          <div class="contact-item">
+            <div>
+              <strong>${contact.fullName}</strong> (${contact.category})<br>
+              <small>📞 ${contact.phone} | ✉️ ${contact.email} | 🏢 ${contact.company || 'N/A'}</small>
+            </div>
+            <div class="btn-group">
+              <button class="btn-edit" onclick="editContact(${contact.id})">Bedel</button>
+              <button class="btn-delete" onclick="deleteContact(${contact.id})">Tirtir</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function filterByCategory(category, btnElement) {
+      currentCategoryFilter = category;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btnElement.classList.add('active');
+      renderContacts();
+    }
+
+    contactForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = contactIdInput.value;
+
+      const contactData = {
+        id: id ? Number(id) : Date.now(),
+        fullName: fullNameInput.value,
+        phone: phoneInput.value,
+        email: emailInput.value,
+        company: companyInput.value,
+        address: addressInput.value,
+        category: categoryInput.value
+      };
+
+      if (id) {
+        contacts = contacts.map(c => c.id === Number(id) ? contactData : c);
+      } else {
+        contacts.push(contactData);
+      }
+
+      localStorage.setItem('contacts_db', JSON.stringify(contacts));
+      contactForm.reset();
+      contactIdInput.value = '';
+      document.getElementById('form-heading').textContent = 'Ku Dar Contact Cusub';
+      
+      switchView('home-view', document.querySelectorAll('.nav-tab')[0]);
+    });
+
+    function deleteContact(id) {
+      if (confirm('Ma hubtaa inaad tirtirto contact-kan?')) {
+        contacts = contacts.filter(c => c.id !== id);
+        localStorage.setItem('contacts_db', JSON.stringify(contacts));
+        renderContacts();
+      }
+    }
+
+    function editContact(id) {
+      const contact = contacts.find(c => c.id === id);
+      if (contact) {
+        contactIdInput.value = contact.id;
+        fullNameInput.value = contact.fullName;
+        phoneInput.value = contact.phone;
+        emailInput.value = contact.email;
+        companyInput.value = contact.company;
+        addressInput.value = contact.address;
+        categoryInput.value = contact.category;
+
+        document.getElementById('form-heading').textContent = 'Wax Ka Bedel Contact-ka';
+        switchView('form-view', document.querySelectorAll('.nav-tab')[1]);
+      }
+    }
+
+    function clearAllContacts() {
+      if (confirm('Ma hubtaa inaad dhammaan xiriiriyeyaasha tirtirto? Action-kan dib looma soo celin karo!')) {
+        contacts = [];
+        localStorage.setItem('contacts_db', JSON.stringify(contacts));
+        renderContacts();
+      }
+    }
+
+    // Function-ka samaynaya Report-ka
+    function generateReport() {
+      document.getElementById('rpt-total').textContent = contacts.length;
+      document.getElementById('rpt-qoyska').textContent = contacts.filter(c => c.category === 'Qoyska').length;
+      document.getElementById('rpt-shaqada').textContent = contacts.filter(c => c.category === 'Shaqada').length;
+      document.getElementById('rpt-macaamiisha').textContent = contacts.filter(c => c.category === 'Macaamiisha').length;
+    }
+
+    liveSearchInput.addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase();
+      const results = contacts.filter(c => 
+        c.fullName.toLowerCase().includes(term) ||
+        c.phone.includes(term) ||
+        c.email.toLowerCase().includes(term) ||
+        (c.company && c.company.toLowerCase().includes(term))
+      );
+
+      searchResultsContainer.innerHTML = '';
+      if(results.length === 0) {
+        searchResultsContainer.innerHTML = '<p class="card">Wax natiijo ah lama helin.</p>';
+        return;
+      }
+
+      results.forEach(contact => {
+        searchResultsContainer.innerHTML += `
+          <div class="contact-item">
+            <div>
+              <strong>${contact.fullName}</strong> (${contact.category})<br>
+              <small>📞 ${contact.phone} | ✉️ ${contact.email} | 🏢 ${contact.company || 'N/A'}</small>
+            </div>
+            <div class="btn-group">
+              <button class="btn-edit" onclick="editContact(${contact.id})">Bedel</button>
+              <button class="btn-delete" onclick="deleteContact(${contact.id})">Tirtir</button>
+            </div>
+          </div>
+        `;
+      });
+    });
+
+    renderContacts();
+  </script>
+</body>
+</html>
